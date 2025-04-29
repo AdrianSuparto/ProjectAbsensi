@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\IzinSakit;
 use App\Models\Siswa;
+use App\Models\KelasSiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -15,8 +16,14 @@ class IzinSakitController extends Controller
     public function index()
     {
         $izinSakits = IzinSakit::with('siswa')->orderBy('tanggal', 'desc')->get();
-        return view('izinSakit.index', compact('izinSakit'));
+
+        foreach ($izinSakits as $izinSakit) {
+            $izinSakit->formatted_tanggal = Carbon::parse($izinSakit->tanggal)->translatedFormat('l, d F Y');
+        }
+
+        return view('izinSakit.index', compact('izinSakits'));
     }
+
 
     /**
      * Tampilkan form tambah data izin/sakit.
@@ -24,7 +31,7 @@ class IzinSakitController extends Controller
     public function create()
     {
         $siswas = Siswa::all();
-        return view('izinSakit.create', compact('siswa'));
+        return view('izinSakit.create', compact('siswas'));
     }
 
     /**
