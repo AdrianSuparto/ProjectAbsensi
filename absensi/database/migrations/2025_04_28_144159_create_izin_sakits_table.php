@@ -11,8 +11,10 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('izin_sakits', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('siswa_id')->constrained('siswas')->onDelete('cascade');
+            $table->uuid('id');
+            $table->primary('id');
+            $table->uuid('siswa_id');
+            $table->foreign('siswa_id')->references('id')->on('siswas')->restrictOnDelete()->restrictOnUpdate();
             $table->date('tanggal');
             $table->enum('jenis', ['Izin', 'Sakit']);
             $table->string('keterangan')->nullable();

@@ -13,15 +13,14 @@ return new class extends Migration {
         Schema::create('absensis', function (Blueprint $table) {
             $table->uuid('id');
             $table->primary('id');
-            $table->string('siswa_id');
+            $table->uuid('siswa_id');
+            $table->foreign('siswa_id')->references('id')->on('siswas')->restrictOnDelete()->restrictOnUpdate();
             $table->date('tanggal');
             $table->time('jam_masuk')->nullable();
             $table->time('jam_pulang')->nullable();
             $table->enum('status_masuk', ['Hadir', 'Terlambat', 'Tidak Masuk', 'Izin', 'Sakit', 'Libur'])->nullable();
             $table->enum('status_pulang', ['Pulang', 'Belum Pulang'])->nullable();
             $table->timestamps();
-
-            $table->foreign('siswa_id')->references('id')->on('siswas')->onDelete('cascade');
         });
     }
 

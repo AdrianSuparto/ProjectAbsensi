@@ -11,11 +11,13 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('siswas', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->uuid('id');
+            $table->primary('id');
             $table->string('no_kartu')->unique();
             $table->string('nis')->unique();
             $table->string('nama');
-            $table->foreignUuid('kelas_id')->constrained('kelas')->onDelete('cascade');
+            $table->uuid('kelas_siswa_id');
+            $table->foreign('kelas_siswa_id')->references('id')->on('kelas_siswas')->restrictOnDelete()->restrictOnUpdate();
             $table->string('nama_ortu');
             $table->string('nomor_ortu');
             $table->timestamps();

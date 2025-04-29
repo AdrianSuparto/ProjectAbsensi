@@ -11,7 +11,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('liburs', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->uuid('id');
+            $table->primary('id');
             $table->date('tanggal');
             $table->string('keterangan')->nullable();
             $table->timestamps();

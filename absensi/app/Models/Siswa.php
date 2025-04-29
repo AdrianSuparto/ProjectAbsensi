@@ -16,14 +16,24 @@ class Siswa extends Model
         'no_kartu',
         'nis',
         'nama',
-        'kelas_id',
+        'kelas_siswa_id',
         'nama_ortu',
         'nomor_ortu',
     ];
 
-    // Relasi ke Kelas
-    public function kelas()
+    // Relasi ke Kelas Siswa
+    public function kelasSiswa()
     {
-        return $this->belongsTo(Kelas::class);
+        return $this->belongsTo(KelasSiswa::class);
+    }
+
+    public function izinSakit()
+    {
+        return $this->hasMany(IzinSakit::class, 'siswa_id');
+    }
+
+    public function absensi()
+    {
+        return $this->hasMany(Absensi::class, 'siswa_id');
     }
 }

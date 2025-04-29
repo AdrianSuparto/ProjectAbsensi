@@ -4,62 +4,92 @@ namespace App\Http\Controllers;
 
 use App\Models\Libur;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class LiburController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Tampilkan daftar semua libur.
      */
     public function index()
     {
-        //
+        $liburs = Libur::orderBy('tanggal', 'asc')->get();
+
+        // Format tanggal pakai Carbon sebelum dikirim ke view (opsional)
+        foreach ($liburs as $libur) {
+            $libur->formatted_tanggal = Carbon::parse($libur->tanggal)->translatedFormat('l, d F Y');
+        }
+
+        return view('libur.index', compact('liburs'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Tampilkan form untuk membuat data libur baru.
      */
     public function create()
     {
-        //
+        return view('libur.create');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Simpan data libur baru ke database.
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'tanggal' => 'required|date|unique:liburs,tanggal',
+            'keterangan' => 'required|string|max:255',
+        ]);
+
+        Libur::create($validatedData);
+
+        return redirect()->route('libur.index')->with('success', 'Data libur berhasil ditambahkan.');
     }
 
     /**
-     * Display the specified resource.
+     * Tampilkan detail 1 libur (opsional, jika dipakai).
      */
     public function show(Libur $libur)
     {
-        //
+        $libur->formatted_tanggal = Carbon::parse($libur->tanggal)->translatedFormat('l, d F Y');
+        return view('libur.show', compact('libur'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Tampilkan form untuk edit data libur.
      */
     public function edit(Libur $libur)
     {
-        //
+        return view('libur.edit', compact('libur'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Perbarui data libur di database.
      */
     public function update(Request $request, Libur $libur)
     {
-        //
+        $validatedData = $request->validate([
+            'tanggal' => 'required|date|unique:liburs,tanggal,' . $libur->id,
+            'keterangan' => 'required|string|max:255',
+        ]);
+
+        $libur->update($validatedData);
+
+        return redirect()->route('libur.index')->with('success', 'Data libur berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Hapus data libur dari database.
      */
     public function destroy(Libur $libur)
     {
-        //
+        try {
+            $libur->delete();
+            return redirect()->route('libur.index')->with('success', 'Data libur berhasil dihapus.');
+        } catch (\Exception $e) {
+            Log::error('Gagal menghapus data libur: ' . $e->getMessage());
+            return redirect()->route('libur.index')->with('error', 'Gagal menghapus data libur.');
+        }
     }
 }

@@ -9,17 +9,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class Absensi extends Model
 {
     use HasFactory, HasUuids;
-
-    protected $table = 'absensis';
-
-    protected $primaryKey = 'id';
-
-    public $incrementing = false; // karena kamu pakai UUID
-
-    protected $keyType = 'string'; // UUID itu biasanya string
-
     protected $fillable = [
-        'id',
         'siswa_id',
         'tanggal',
         'jam_masuk',
@@ -38,6 +28,6 @@ class Absensi extends Model
 
     public function siswa()
     {
-        return $this->belongsTo(Siswa::class, 'siswa_id');
+        return $this->belongsTo(Siswa::class);
     }
 }
