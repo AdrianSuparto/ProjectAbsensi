@@ -56,13 +56,22 @@
                         </a>
                     </li>
 
-                    <li class="sidebar-item {{ Request::is('absensi') ? 'active' : '' }}">
-                        <a class="sidebar-link" href="{{ asset('absensi') }}">
-                            <i class="align-middle" data-feather="check-square"></i> <span class="align-middle">Database
-                                Absensi
-                            </span>
+                    {{-- Menu Scan Absensi --}}
+                    <li class="sidebar-item {{ Request::routeIs('absensi.scan.page') ? 'active' : '' }}">
+                        <a class="sidebar-link" href="{{ route('absensi.scan.page') }}">
+                            <i class="align-middle" data-feather="check-square"></i>
+                            <span class="align-middle">Scan Absensi</span>
                         </a>
                     </li>
+
+                    {{-- Menu Database Absensi --}}
+                    <li class="sidebar-item {{ Request::routeIs('absensi.index') ? 'active' : '' }}">
+                        <a class="sidebar-link" href="{{ route('absensi.index') }}">
+                            <i class="align-middle" data-feather="database"></i>
+                            <span class="align-middle">Database Absensi</span>
+                        </a>
+                    </li>
+
 
                     <li class="sidebar-item {{ Request::is('izinSakit') ? 'active' : '' }}">
                         <a class="sidebar-link" href="{{ asset('izinSakit') }}">

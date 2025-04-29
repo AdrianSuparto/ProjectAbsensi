@@ -1,49 +1,47 @@
-<!DOCTYPE html>
-<html>
+@extends('layout.main')
 
-<head>
-    <title>Absensi Siswa</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-</head>
-
-<body>
-    <h2>Silakan Tempelkan Kartu</h2>
-    <input type="text" id="uid_input" autofocus autocomplete="off" style="font-size:24px;">
-    <div id="status" style="margin-top:10px; font-size:18px;"></div>
+@section('content')
+    <div class="container">
+        <h2>Scan Kartu Absensi</h2>
+        <form id="scanForm">
+            <input type="text" id="uidInput" name="uid" maxlength="10" autofocus class="form-control">
+        </form>
+        <div id="message" class="mt-3 alert"></div>
+    </div>
 
     <script>
-        const input = document.getElementById('uid_input');
-        const status = document.getElementById('status');
+        const input = document.getElementById('uidInput');
+        const form = document.getElementById('scanForm');
+        const message = document.getElementById('message');
 
-        input.addEventListener('input', function() {
-            const uid = input.value.trim();
+        input.focus();
 
-            if (uid.length === 10) {
-                fetch('/absensi/scan', {
+        input.addEventListener('input', () => {
+            if (input.value.length === 10) {
+                fetch("{{ route('absensi.scan') }}", {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                                'content')
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            uid: uid
+                            uid: input.value
                         })
                     })
-                    .then(res => res.json())
+                    .then(response => response.json())
                     .then(data => {
-                        status.innerText = data.message;
-                        input.value = "";
+                        message.className = 'alert alert-success';
+                        message.innerText = data.message;
+                        input.value = '';
                         input.focus();
                     })
-                    .catch(() => {
-                        status.innerText = "Gagal memproses absensi.";
-                        input.value = "";
+                    .catch(err => {
+                        message.className = 'alert alert-danger';
+                        message.innerText = 'Gagal: Kartu tidak dikenal atau terjadi error.';
+                        input.value = '';
                         input.focus();
                     });
             }
         });
     </script>
-</body>
-
-</html>
+@endsection

@@ -13,7 +13,10 @@ class AbsensiController extends Controller
     public function index()
     {
         $absensis = Absensi::with('siswa')->orderBy('tanggal', 'desc')->get();
+
+
         return view('absensi.index', compact('absensis'));
+
     }
 
     public function create()
@@ -86,7 +89,7 @@ class AbsensiController extends Controller
     public function scan(Request $request)
     {
         $request->validate([
-            'uid' => 'required|digits:10', // karena output reader 10 digit
+            'uid' => 'required|digits:10',
         ]);
 
         $siswa = Siswa::where('no_kartu', $request->uid)->first();
@@ -95,14 +98,40 @@ class AbsensiController extends Controller
             return response()->json(['message' => 'Kartu tidak dikenali.'], 404);
         }
 
-        $tanggal = Carbon::now()->toDateString();
+        $tanggal = Carbon::today();
+        $now = Carbon::now();
 
-        $absensi = Absensi::firstOrCreate(
-            ['siswa_id' => $siswa->id, 'tanggal' => $tanggal],
-            ['id' => (string) Str::uuid(), 'jam_masuk' => Carbon::now(), 'status_masuk' => 'Hadir']
-        );
+        $absensi = Absensi::where('siswa_id', $siswa->id)
+            ->where('tanggal', $tanggal)
+            ->first();
 
-        return response()->json(['message' => "Absensi berhasil: {$siswa->nama}"]);
+        if (!$absensi) {
+            // Absen pertama (masuk)
+            Absensi::create([
+                'id' => (string) Str::uuid(),
+                'siswa_id' => $siswa->id,
+                'tanggal' => $tanggal,
+                'jam_masuk' => $now,
+                'status_masuk' => $now->format('H:i') > '07:00' ? 'Terlambat' : 'Hadir',
+            ]);
+            return response()->json(['message' => "Absen Masuk: {$siswa->nama}"]);
+        }
+
+        if (!$absensi->jam_pulang) {
+            // Absen kedua (pulang)
+            $absensi->update([
+                'jam_pulang' => $now,
+                'status_pulang' => 'Pulang',
+            ]);
+            return response()->json(['message' => "Absen Pulang: {$siswa->nama}"]);
+        }
+
+        // Sudah absen masuk dan pulang
+        return response()->json(['message' => "{$siswa->nama} sudah absen lengkap hari ini."]);
     }
 
+    public function showScanPage()
+    {
+        return view('absensi.scan');
+    }
 }
