@@ -2,10 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\KelasSiswaController;
-
+use App\Http\Controllers\SiswaController;
 
 Route::get('/', function () {
     return view('dashboard');
 });
 
 Route::resource('kelasSiswa', KelasSiswaController::class);
+Route::resource('siswa', SiswaController::class);

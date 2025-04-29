@@ -15,7 +15,7 @@ class SiswaController extends Controller
     public function index()
     {
         $siswas = Siswa::with('kelasSiswa')->get();
-        return view('siswa.index', compact('siswa'));
+        return view('siswa.index', compact('siswas'));
     }
 
     /**
@@ -36,13 +36,13 @@ class SiswaController extends Controller
             'no_kartu' => 'required|unique:siswas',
             'nis' => 'required|unique:siswas',
             'nama' => 'required',
-            'kelasSiswa_id' => 'required',
+            'kelas_siswa_id' => 'required', // disesuaikan
             'nama_ortu' => 'required',
             'nomor_ortu' => 'required',
         ]);
 
         Siswa::create($validated);
-        return redirect()->route('siswa.index')->with('success', 'Siswa "' . $validated['nama'] . '" berhasil ditambahkan.');
+        return redirect()->route('siswa.index')->with('success', 'Siswa berhasil ditambahkan.');
     }
 
     /**
@@ -63,13 +63,13 @@ class SiswaController extends Controller
             'no_kartu' => 'required|unique:siswas,no_kartu,' . $siswa->id,
             'nis' => 'required|unique:siswas,nis,' . $siswa->id,
             'nama' => 'required',
-            'kelasSiswa_id' => 'required',
+            'kelas_siswa_id' => 'required', // disesuaikan
             'nama_ortu' => 'required',
             'nomor_ortu' => 'required',
         ]);
 
         $siswa->update($validated);
-        return redirect()->route('siswa.index')->with('success', 'Data siswa "' . $validated['nama'] . '" berhasil diperbarui.');
+        return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil diperbarui.');
     }
 
     /**
@@ -80,7 +80,7 @@ class SiswaController extends Controller
         try {
             $nama = $siswa->nama;
             $siswa->delete();
-            return redirect()->route('siswa.index')->with('success', 'Siswa "' . $nama . '" berhasil dihapus.');
+            return redirect()->route('siswa.index')->with('success', 'Data Siswa berhasil dihapus.');
         } catch (\Exception $e) {
             Log::error('Gagal menghapus siswa: ' . $e->getMessage());
             return redirect()->route('siswa.index')->with('error', 'Gagal menghapus data siswa.');
