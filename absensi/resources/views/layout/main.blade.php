@@ -16,6 +16,10 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap') }}"
         rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"></script>
+
+
 </head>
 
 <body>
@@ -31,40 +35,41 @@
                         Menu Utama
                     </li>
 
-                    <li class="sidebar-item active">
+                    <li class="sidebar-item {{ Request::is('/') ? 'active' : '' }}">
                         <a class="sidebar-link" href="{{ asset('/') }}">
                             <i class="align-middle" data-feather="sliders"></i> <span
                                 class="align-middle">Dashboard</span>
                         </a>
                     </li>
 
-                    <li class="sidebar-item">
+                    <li class="sidebar-item {{ Request::is('siswa') ? 'active' : '' }}">
                         <a class="sidebar-link" href="{{ asset('siswa') }}">
-                            <i class="align-middle" data-feather="user"></i> <span class="align-middle">Database
+                            <i class="align-middle" data-feather="users"></i> <span class="align-middle">Database
                                 Siswa</span>
                         </a>
                     </li>
 
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ asset('kelas') }}">
-                            <i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Database
+                    <li class="sidebar-item {{ Request::is('kelasSiswa') ? 'active' : '' }}">
+                        <a class="sidebar-link" href="{{ asset('kelasSiswa') }}">
+                            <i class="align-middle" data-feather="book"></i> <span class="align-middle">Database
                                 Kelas</span>
                         </a>
                     </li>
 
-                    <li class="sidebar-item">
+                    <li class="sidebar-item {{ Request::is('absensi') ? 'active' : '' }}">
                         <a class="sidebar-link" href="{{ asset('absensi') }}">
-                            <i class="align-middle" data-feather="user-plus"></i> <span
-                                class="align-middle">Absensi</span>
+                            <i class="align-middle" data-feather="check-square"></i> <span class="align-middle">Absensi
+                                Siswa</span>
                         </a>
                     </li>
 
-                    <li class="sidebar-item">
+                    <li class="sidebar-item {{ Request::is('izinSakit') ? 'active' : '' }}">
                         <a class="sidebar-link" href="{{ asset('izinSakit') }}">
-                            <i class="align-middle" data-feather="book"></i> <span class="align-middle">Database
+                            <i class="align-middle" data-feather="database"></i> <span class="align-middle">Database
                                 Izin</span>
                         </a>
                     </li>
+                </ul>
 
         </nav>
 
@@ -106,6 +111,58 @@
     </div>
 
     <script src="{{ asset('js/app.js') }}"></script>
+
+    <!-- Sweet Alert -->
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script type="text/javascript">
+        $(document).on('click', '.show_confirm', function(event) {
+            event.preventDefault();
+            var form = $(this).closest("form");
+            var nama = $(this).data("nama");
+
+            Swal.fire({
+                title: `Hapus Data ${nama}?`,
+                text: "Tindakan ini tidak dapat dibatalkan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#ffc107',
+                confirmButtonText: '🔥 YA, HAPUS!',
+                cancelButtonText: '⛔ BATALKAN',
+                reverseButtons: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    </script>
+
+
+    <script type="text/javascript">
+        @if (session('success'))
+            Swal.fire({
+                title: 'BERHASIL!',
+                text: '{{ session('success') }}',
+                icon: 'success',
+                confirmButtonText: '👍 OKE',
+                confirmButtonColor: '#28a745'
+            });
+        @endif
+
+        @if (session('error'))
+            Swal.fire({
+                title: '❌ GAGAL!',
+                text: '{{ session('error') }}',
+                icon: 'error',
+                confirmButtonText: '⚠️ MENGERTI',
+                confirmButtonColor: '#dc3545'
+            });
+        @endif
+    </script>
+
 
 </body>
 
