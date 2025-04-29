@@ -5,7 +5,7 @@ use App\Http\Controllers\KelasSiswaController;
 
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('dashboard');
 });
 
 Route::resource('kelasSiswa', KelasSiswaController::class);
