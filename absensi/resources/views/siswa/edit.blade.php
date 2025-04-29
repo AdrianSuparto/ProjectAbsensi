@@ -57,9 +57,9 @@
                                 value="{{ old('nomor_ortu', $siswa->nomor_ortu) }}">
                         </div>
 
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ route('siswa.index') }}" class="btn btn-secondary">Kembali</a>
-                            <button type="submit" class="btn btn-primary">Update Siswa</button>
+                        <div class="d-flex justify-content-end">
+                            <a href="{{ route('siswa.index') }}" class="btn btn-secondary me-2">Kembali</a>
+                            <button type="submit" class="btn btn-primary">Update </button>
                         </div>
 
 

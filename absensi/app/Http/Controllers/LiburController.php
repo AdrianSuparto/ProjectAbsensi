@@ -15,7 +15,7 @@ class LiburController extends Controller
     public function index()
     {
         $liburs = Libur::orderBy('tanggal', 'asc')->get();
-
+        Carbon::setLocale('id');
         // Format tanggal pakai Carbon sebelum dikirim ke view (opsional)
         foreach ($liburs as $libur) {
             $libur->formatted_tanggal = Carbon::parse($libur->tanggal)->translatedFormat('l, d F Y');

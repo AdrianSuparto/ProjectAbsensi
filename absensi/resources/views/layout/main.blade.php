@@ -58,8 +58,9 @@
 
                     <li class="sidebar-item {{ Request::is('absensi') ? 'active' : '' }}">
                         <a class="sidebar-link" href="{{ asset('absensi') }}">
-                            <i class="align-middle" data-feather="check-square"></i> <span class="align-middle">Absensi
-                                Siswa</span>
+                            <i class="align-middle" data-feather="check-square"></i> <span class="align-middle">Database
+                                Absensi
+                            </span>
                         </a>
                     </li>
 
@@ -67,6 +68,13 @@
                         <a class="sidebar-link" href="{{ asset('izinSakit') }}">
                             <i class="align-middle" data-feather="database"></i> <span class="align-middle">Database
                                 Izin</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar-item {{ Request::is('libur') ? 'active' : '' }}">
+                        <a class="sidebar-link" href="{{ asset('libur') }}">
+                            <i class="align-middle" data-feather="moon"></i> <span class="align-middle">Database
+                                Libur</span>
                         </a>
                     </li>
                 </ul>
