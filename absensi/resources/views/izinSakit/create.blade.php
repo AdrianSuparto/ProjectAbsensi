@@ -22,12 +22,6 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="tanggal">Tanggal</label>
-                            <input type="date" class="form-control" id="tanggal" name="tanggal" required
-                                value="{{ old('tanggal') }}">
-                        </div>
-
-                        <div class="form-group mb-3">
                             <label for="jenis">Jenis</label>
                             <select name="jenis" id="jenis" class="form-control" required>
                                 <option value="Izin">Izin</option>

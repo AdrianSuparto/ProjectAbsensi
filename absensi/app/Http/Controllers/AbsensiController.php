@@ -7,6 +7,7 @@ use App\Models\Siswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use App\Models\IzinSakit;
 
 class AbsensiController extends Controller
 {
@@ -36,10 +37,28 @@ class AbsensiController extends Controller
             'status_pulang' => 'nullable|string',
         ]);
 
-        $validated['id'] = (string) Str::uuid(); // karena pakai UUID
+        $tanggal = Carbon::today()->toDateString();
 
-        // Carbon parsing
-        $validated['tanggal'] = Carbon::parse($validated['tanggal']);
+        $izinSakit = IzinSakit::where('siswa_id', $validated['siswa_id'])
+        ->whereDate('tanggal', $tanggal)
+        ->first();
+
+        if ($izinSakit) {
+            return redirect()->back()->withErrors(['siswa_id' => 'Siswa ini sudah tercatat izin/sakit hari ini.']);
+        }
+
+        // Cek apakah sudah pernah absen
+        $sudahAbsen = Absensi::where('siswa_id', $validated['siswa_id'])
+            ->whereDate('tanggal', $validated['tanggal'])
+            ->exists();
+
+        if ($sudahAbsen) {
+            return redirect()->back()->withErrors(['siswa_id' => 'Siswa ini sudah absen pada tanggal tersebut.']);
+        }
+
+        $validated['id'] = (string) Str::uuid();
+        $validated['tanggal'] = \Illuminate\Support\Carbon::parse($validated['tanggal']);
+
         if ($validated['jam_masuk']) {
             $validated['jam_masuk'] = Carbon::createFromFormat('H:i:s', $validated['jam_masuk']);
         }
@@ -50,6 +69,7 @@ class AbsensiController extends Controller
         Absensi::create($validated);
         return redirect()->route('absensi.index')->with('success', 'Data absensi berhasil ditambahkan.');
     }
+
 
     public function edit(Absensi $absensi)
     {
@@ -101,33 +121,60 @@ class AbsensiController extends Controller
         $tanggal = Carbon::today();
         $now = Carbon::now();
 
+        // Cek izin/sakit
+        $izinSakit = IzinSakit::where('siswa_id', $siswa->id)
+            ->whereDate('tanggal', $tanggal)
+            ->first();
+
+        if ($izinSakit) {
+            return response()->json([
+                'message' => "{$siswa->nama} tidak dapat absen karena sedang {$izinSakit->jenis}."
+            ]);
+        }
+
         $absensi = Absensi::where('siswa_id', $siswa->id)
             ->where('tanggal', $tanggal)
             ->first();
 
         if (!$absensi) {
-            // Absen pertama (masuk)
-            Absensi::create([
+            // Absen masuk
+            $statusMasuk = $now->format('H:i') > '07:00' ? 'Terlambat' : 'Hadir';
+
+            $absenMasuk = Absensi::create([
                 'id' => (string) Str::uuid(),
                 'siswa_id' => $siswa->id,
                 'tanggal' => $tanggal,
                 'jam_masuk' => $now,
-                'status_masuk' => $now->format('H:i') > '07:00' ? 'Terlambat' : 'Hadir',
+                'status_masuk' => $statusMasuk,
             ]);
-            return response()->json(['message' => "Absen Masuk: {$siswa->nama}"]);
+
+            return response()->json([
+                'message' => "✅ Absensi Masuk Berhasil\n" .
+                            "Nama: {$siswa->nama}\n" .
+                            "Jam Masuk: " . $now->format('H:i:s') . "\n" .
+                            "Status: {$statusMasuk}"
+            ]);
         }
 
         if (!$absensi->jam_pulang) {
-            // Absen kedua (pulang)
+            // Absen pulang
             $absensi->update([
                 'jam_pulang' => $now,
                 'status_pulang' => 'Pulang',
             ]);
-            return response()->json(['message' => "Absen Pulang: {$siswa->nama}"]);
+
+            return response()->json([
+                'message' => "✅ Absensi Pulang Berhasil\n" .
+                            "Nama: {$siswa->nama}\n" .
+                            "Jam Pulang: " . $now->format('H:i:s') . "\n" .
+                            "Status: Pulang"
+            ]);
         }
 
-        // Sudah absen masuk dan pulang
-        return response()->json(['message' => "{$siswa->nama} sudah absen lengkap hari ini."]);
+        // Sudah lengkap
+        return response()->json([
+            'message' => "{$siswa->nama} sudah melakukan absensi masuk dan pulang hari ini."
+        ]);
     }
 
     public function showScanPage()

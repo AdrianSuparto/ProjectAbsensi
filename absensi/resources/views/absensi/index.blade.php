@@ -7,6 +7,9 @@
             <div class="card">
                 <div class="card-header d-flex align-items-center">
                     <h4 class="card-title">Daftar Absensi</h4>
+                    <a href="{{ route('izinSakit.create') }}" class="btn btn-primary btn-round ms-auto">
+                        <i class="fa fa-plus"></i> Tambah Izin/Sakit
+                    </a>
                     {{-- Jika perlu tombol tambah absensi manual --}}
                     {{-- <a href="{{ route('absensi.create') }}" class="btn btn-primary btn-round ms-auto">
                         <i class="fa fa-plus"></i> Tambah Absensi

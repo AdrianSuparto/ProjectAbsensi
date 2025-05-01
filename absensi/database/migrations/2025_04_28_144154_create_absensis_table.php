@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->time('jam_masuk')->nullable();
             $table->time('jam_pulang')->nullable();
             $table->enum('status_masuk', ['Hadir', 'Terlambat', 'Tidak Masuk', 'Izin', 'Sakit', 'Libur'])->nullable();
-            $table->enum('status_pulang', ['Pulang', 'Belum Pulang'])->nullable();
+            $table->enum('status_pulang', ['Pulang', 'Belum Pulang', 'Tidak Masuk', 'Izin', 'Sakit', 'Libur'])->nullable();
             $table->timestamps();
         });
     }

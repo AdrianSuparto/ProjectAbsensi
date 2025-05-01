@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class Absensi extends Model
 {
     use HasFactory, HasUuids;
+    protected $table = 'absensis';
     protected $fillable = [
         'siswa_id',
         'tanggal',
