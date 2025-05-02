@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use App\Models\IzinSakit;
+use App\Models\Libur;
+
 
 class AbsensiController extends Controller
 {
@@ -129,6 +131,13 @@ class AbsensiController extends Controller
         if ($izinSakit) {
             return response()->json([
                 'message' => "{$siswa->nama} tidak dapat absen karena sedang {$izinSakit->jenis}."
+            ]);
+        }
+
+        $libur = Libur::whereDate('tanggal', $tanggal)->first();
+        if ($libur) {
+            return response()->json([
+                'message' => "{$siswa->nama} tidak dapat absen karena hari ini libur ({$libur->keterangan})."
             ]);
         }
 
