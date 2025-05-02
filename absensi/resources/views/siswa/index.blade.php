@@ -16,6 +16,21 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    <form method="GET" action="{{ route('siswa.index') }}" class="mb-3">
+                        <div class="row align-items-center">
+                            <div class="col-md-3">
+                                <label for="kelas">Filter Kelas:</label>
+                                <select name="kelas" id="kelas" class="form-select" onchange="this.form.submit()">
+                                    <option value="">-- Semua Kelas --</option>
+                                    @foreach ($kelasList as $kelas)
+                                        <option value="{{ $kelas->id }}" {{ request('kelas') == $kelas->id ? 'selected' : '' }}>
+                                            {{ $kelas->nama }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </form>
                     <div class="table-responsive">
                         <table id="add-row" class="display table table-bordered table-hover">
                             <thead class="thead-dark">

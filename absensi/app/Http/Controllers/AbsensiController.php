@@ -9,18 +9,31 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use App\Models\IzinSakit;
 use App\Models\Libur;
+use App\Models\KelasSiswa;
 
 
 class AbsensiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $absensis = Absensi::with('siswa')->orderBy('tanggal', 'desc')->get();
+        $kelasId = $request->input('kelas');
 
+        $query = Absensi::with(['siswa.kelasSiswa'])->orderBy('tanggal', 'desc');
 
-        return view('absensi.index', compact('absensis'));
+        if ($kelasId) {
+            $query->whereHas('siswa', function ($q) use ($kelasId) {
+                $q->where('kelas_siswa_id', $kelasId);
+            });
+        }
 
+        $absensis = $query->get();
+
+        // Ambil semua daftar kelas
+        $kelasList = KelasSiswa::all();
+
+        return view('absensi.index', compact('absensis', 'kelasList', 'kelasId'));
     }
+
 
     public function create()
     {

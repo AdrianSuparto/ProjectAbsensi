@@ -12,11 +12,22 @@ class SiswaController extends Controller
     /**
      * Tampilkan semua siswa beserta kelasnya.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $siswas = Siswa::with('kelasSiswa')->get();
-        return view('siswa.index', compact('siswas'));
+        $kelasId = $request->kelas;
+
+        $query = Siswa::with('kelasSiswa');
+
+        if ($kelasId) {
+            $query->where('kelas_siswa_id', $kelasId);
+        }
+
+        $siswas = $query->get();
+        $kelasList = KelasSiswa::all();
+
+        return view('siswa.index', compact('siswas', 'kelasList', 'kelasId'));
     }
+
 
     /**
      * Tampilkan form untuk menambahkan siswa baru.

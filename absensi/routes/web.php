@@ -6,10 +6,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\KelasSiswaController;
 use App\Http\Controllers\LiburController;
 use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\DashboardController;
 
-Route::get('/', function () {
-    return view('dashboard');
-});
+// Route::get('/', function () {
+//     return view('dashboard');
+// });
+
+
+Route::resource('dashboard', DashboardController::class);
 
 Route::resource('kelasSiswa', KelasSiswaController::class);
 Route::resource('siswa', SiswaController::class);
