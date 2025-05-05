@@ -8,9 +8,9 @@ use App\Http\Controllers\LiburController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\DashboardController;
 
-// Route::get('/', function () {
-//     return view('dashboard');
-// });
+
+Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
+
 
 
 Route::resource('dashboard', DashboardController::class);
@@ -23,4 +23,5 @@ Route::resource('absensi', AbsensiController::class)->except(['show']);
 
 
 Route::get('/absensi/scan', [AbsensiController::class, 'showScanPage'])->name('absensi.scan.page');
+Route::get('/absensi/ekspor', [AbsensiController::class, 'ekspor'])->name('absensi.ekspor');
 Route::post('/absensi/scan', [AbsensiController::class, 'scan'])->name('absensi.scan');

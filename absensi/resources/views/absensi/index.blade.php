@@ -5,11 +5,16 @@
     <div class="container">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header d-flex align-items-center">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title">Daftar Absensi</h4>
-                    <a href="{{ route('izinSakit.create') }}" class="btn btn-primary btn-round ms-auto">
-                        <i class="fa fa-plus"></i> Tambah Izin/Sakit
-                    </a>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('absensi.ekspor') }}" class="btn btn-success btn-round">
+                            <i class="fa fa-file-excel"></i> Export Excel
+                        </a>
+                        <a href="{{ route('izinSakit.create') }}" class="btn btn-primary btn-round">
+                            <i class="fa fa-plus"></i> Tambah Izin/Sakit
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
 

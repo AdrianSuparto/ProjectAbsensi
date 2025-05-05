@@ -10,6 +10,9 @@ use Illuminate\Support\Str;
 use App\Models\IzinSakit;
 use App\Models\Libur;
 use App\Models\KelasSiswa;
+use App\Exports\AbsensiExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 
 class AbsensiController extends Controller
@@ -203,4 +206,11 @@ class AbsensiController extends Controller
     {
         return view('absensi.scan');
     }
+
+    public function ekspor()
+    {
+        $filename = 'absensi-6-bulan-terakhir.xlsx';
+        return Excel::download(new AbsensiExport, $filename);
+    }
+    
 }
