@@ -12,6 +12,8 @@ use App\Models\Libur;
 use App\Models\KelasSiswa;
 use App\Exports\AbsensiExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Helpers\WablasHelper;
+
 
 
 
@@ -173,6 +175,15 @@ class AbsensiController extends Controller
                 'status_masuk' => $statusMasuk,
             ]);
 
+            $no_hp_wali = $siswa->nomor_ortu;
+            $no_hp_wali_global = '62' . substr($no_hp_wali, 1);
+            WablasHelper::kirimPesan(
+                $no_hp_wali_global,
+                "✅ Absensi Masuk\nNama: {$siswa->nama}\nJam: " . $now->format('H:i:s') . "\nStatus: {$statusMasuk}"
+            );
+            \Log::info("Nomor asal: " . $no_hp_wali);
+            \Log::info("Nomor yang dikirim ke Wablas: " . $no_hp_wali_global);
+        
             return response()->json([
                 'message' => "✅ Absensi Masuk Berhasil\n" .
                             "Nama: {$siswa->nama}\n" .
@@ -187,6 +198,13 @@ class AbsensiController extends Controller
                 'jam_pulang' => $now,
                 'status_pulang' => 'Pulang',
             ]);
+
+            $no_hp_wali = $siswa->nomor_ortu;
+            $no_hp_wali_global = '62' . substr($no_hp_wali, 1);
+            WablasHelper::kirimPesan(
+                $no_hp_wali_global,
+                "🏁 Absensi Pulang\nNama: {$siswa->nama}\nJam: " . $now->format('H:i:s') . "\nStatus: Pulang"
+            );
 
             return response()->json([
                 'message' => "✅ Absensi Pulang Berhasil\n" .
