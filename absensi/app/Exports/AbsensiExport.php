@@ -21,6 +21,7 @@ class AbsensiExport implements FromCollection, WithHeadings
                 return [
                     'ID Siswa' => $absen->siswa_id,
                     'Nama Siswa' => optional($absen->siswa)->nama ?? '-',
+                    'Kelas' => optional($absen->siswa->kelasSiswa)->nama ?? '-',
                     'Tanggal' => $absen->tanggal->format('Y-m-d'),
                     'Jam Masuk' => $absen->jam_masuk,
                     'Status Masuk' => $absen->status_masuk,
@@ -35,6 +36,7 @@ class AbsensiExport implements FromCollection, WithHeadings
         return [
             'ID Siswa',
             'Nama Siswa',
+            'Kelas',
             'Tanggal',
             'Jam Masuk',
             'Status Masuk',

@@ -44,7 +44,7 @@
                                     <tr>
                                         <td>{{ $absensi->tanggal->format('d-m-Y') }}</td>
                                         <td>{{ $absensi->siswa->nama }}</td>
-                                        <td>{{ $absensi->siswa->kelasSiswa->nama_kelas ?? '-' }}</td>
+                                        <td>{{ $absensi->siswa->kelasSiswa->nama ?? '-' }}</td>
                                         <td>{{ $absensi->jam_masuk ? $absensi->jam_masuk->format('H:i:s') : '-' }}</td>
                                         <td>{{ $absensi->status_masuk ?? '-' }}</td>
                                         <td>{{ $absensi->jam_pulang ? $absensi->jam_pulang->format('H:i:s') : '-' }}</td>
