@@ -18,11 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })
-    ->booted(function (Application $app) {
-        Log::info('Booted scheduler: ' . now());
-        // Pastikan command sudah terdaftar dalam Schedule
-        $schedule = $app->make(Schedule::class);
-        $schedule->command('absensi:libur') // Nama command
-        ->everyMinute(); // Atur waktu yang tepat (misal setiap jam 06:00)
-    })
+    // ->booted(function (Application $app) {
+    //     Log::info('Booted scheduler: ' . now());
+    //     // Pastikan command sudah terdaftar dalam Schedule
+    //     $schedule = $app->make(Schedule::class);
+    //     $schedule->command('absensi:libur') // Nama command
+    //     ->everyMinute(); // Atur waktu yang tepat (misal setiap jam 06:00)
+    // })
     ->create();

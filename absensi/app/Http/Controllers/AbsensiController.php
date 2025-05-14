@@ -132,6 +132,14 @@ class AbsensiController extends Controller
             'uid' => 'required|digits:10',
         ]);
 
+        // Cek hari Sabtu/Minggu
+        $dayOfWeek = Carbon::now()->dayOfWeek;
+        if ($dayOfWeek === Carbon::SATURDAY || $dayOfWeek === Carbon::SUNDAY) {
+            return response()->json([
+                'message' => 'Absensi tidak diperlukan di hari Sabtu/Minggu'
+            ]);
+        }
+
         $siswa = Siswa::where('no_kartu', $request->uid)->first();
 
         if (!$siswa) {
@@ -140,6 +148,14 @@ class AbsensiController extends Controller
 
         $tanggal = Carbon::today();
         $now = Carbon::now();
+
+        // Cek libur nasional
+        $libur = Libur::whereDate('tanggal', $tanggal)->first();
+        if ($libur) {
+            return response()->json([
+                'message' => "{$siswa->nama} tidak dapat absen karena hari ini libur ({$libur->keterangan})."
+            ]);
+        }
 
         // Cek izin/sakit
         $izinSakit = IzinSakit::where('siswa_id', $siswa->id)
@@ -152,38 +168,29 @@ class AbsensiController extends Controller
             ]);
         }
 
-        $libur = Libur::whereDate('tanggal', $tanggal)->first();
-        if ($libur) {
-            return response()->json([
-                'message' => "{$siswa->nama} tidak dapat absen karena hari ini libur ({$libur->keterangan})."
-            ]);
-        }
-
-        $absensi = Absensi::where('siswa_id', $siswa->id)
-            ->where('tanggal', $tanggal)
-            ->first();
-
-        if (!$absensi) {
-            // Absen masuk
-            $statusMasuk = $now->format('H:i') > '07:00' ? 'Terlambat' : 'Hadir';
-
-            $absenMasuk = Absensi::create([
-                'id' => (string) Str::uuid(),
+        // Cek atau buat record absensi dengan default 'Tidak Masuk'
+        $absensi = Absensi::firstOrCreate(
+            [
                 'siswa_id' => $siswa->id,
-                'tanggal' => $tanggal,
-                'jam_masuk' => $now,
-                'status_masuk' => $statusMasuk,
-            ]);
+                'tanggal' => $tanggal
+            ],
+            [
+                'id' => (string) Str::uuid(),
+                'status_masuk' => 'Tidak Masuk',
+                'status_pulang' => 'Tidak Masuk'
+            ]
+        );
 
-            $no_hp_wali = $siswa->nomor_ortu;
-            $no_hp_wali_global = '62' . substr($no_hp_wali, 1);
-            WablasHelper::kirimPesan(
-                $no_hp_wali_global,
-                "✅ Absensi Masuk\nNama: {$siswa->nama}\nJam: " . $now->format('H:i:s') . "\nStatus: {$statusMasuk}"
-            );
-            \Log::info("Nomor asal: " . $no_hp_wali);
-            \Log::info("Nomor yang dikirim ke Wablas: " . $no_hp_wali_global);
-        
+        // Proses absensi masuk/pulang
+        if (!$absensi->jam_masuk) {
+            $statusMasuk = $now->format('H:i') > '07:00' ? 'Terlambat' : 'Hadir';
+            
+            $absensi->update([
+                'jam_masuk' => $now,
+                'status_masuk' => $statusMasuk
+            ]);
+            
+            // Kirim notifikasi
             return response()->json([
                 'message' => "✅ Absensi Masuk Berhasil\n" .
                             "Nama: {$siswa->nama}\n" .
@@ -193,19 +200,12 @@ class AbsensiController extends Controller
         }
 
         if (!$absensi->jam_pulang) {
-            // Absen pulang
             $absensi->update([
                 'jam_pulang' => $now,
-                'status_pulang' => 'Pulang',
+                'status_pulang' => 'Pulang'
             ]);
-
-            $no_hp_wali = $siswa->nomor_ortu;
-            $no_hp_wali_global = '62' . substr($no_hp_wali, 1);
-            WablasHelper::kirimPesan(
-                $no_hp_wali_global,
-                "🏁 Absensi Pulang\nNama: {$siswa->nama}\nJam: " . $now->format('H:i:s') . "\nStatus: Pulang"
-            );
-
+            
+            // Kirim notifikasi
             return response()->json([
                 'message' => "✅ Absensi Pulang Berhasil\n" .
                             "Nama: {$siswa->nama}\n" .
@@ -214,9 +214,8 @@ class AbsensiController extends Controller
             ]);
         }
 
-        // Sudah lengkap
         return response()->json([
-            'message' => "{$siswa->nama} sudah melakukan absensi masuk dan pulang hari ini."
+            'message' => "{$siswa->nama} sudah melakukan absensi lengkap hari ini."
         ]);
     }
 

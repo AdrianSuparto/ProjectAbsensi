@@ -1,10 +1,13 @@
 <?php
+
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Absensi;
 use Carbon\Carbon;
 use App\Models\Libur;
+use App\Models\Siswa;
+use Illuminate\Support\Str;
 
 class IsiAbsensiLibur extends Command
 {
@@ -13,41 +16,40 @@ class IsiAbsensiLibur extends Command
 
     public function handle()
     {
-        \Log::info('Command absensi:libur dijalankan pada: ' . now());
-        // Cek apakah hari ini hari libur
-        $tanggalHariIni = Carbon::today()->format('Y-m-d');
-        $isLibur = $this->cekHariLibur($tanggalHariIni);
+        $today = Carbon::today();
+
+        // Skip weekend
+        if ($today->isWeekend()) {
+            $this->info('Hari ini weekend, tidak perlu isi absensi libur.');
+            return;
+        }
+
+        // Cek libur nasional
+        $isLibur = Libur::whereDate('tanggal', $today)->exists();
 
         if ($isLibur) {
-            // Dapatkan siswa-siswa yang seharusnya libur
-            $siswa = \App\Models\Siswa::all(); // Ambil semua data siswa, atau sesuaikan query
+            $siswas = Siswa::all();
 
-            foreach ($siswa as $s) {
-                $sudahAda = Absensi::where('siswa_id', $s->id)
-                            ->where('tanggal', $tanggalHariIni)
-                            ->exists();
-            
-                if (!$sudahAda) {
-                    Absensi::create([
-                        'siswa_id' => $s->id,
-                        'tanggal' => $tanggalHariIni,
+            foreach ($siswas as $siswa) {
+                // Gunakan firstOrCreate untuk hindari duplikasi
+                Absensi::firstOrCreate(
+                    [
+                        'siswa_id' => $siswa->id,
+                        'tanggal' => $today
+                    ],
+                    [
+                        'id' => (string) Str::uuid(),
+                        'status_masuk' => 'Libur',
+                        'status_pulang' => 'Libur',
                         'jam_masuk' => null,
-                        'status_masuk' => 'libur',
-                        'jam_pulang' => null,
-                        'status_pulang' => 'libur',
-                    ]);
-                }
+                        'jam_pulang' => null
+                    ]
+                );
             }
-            $this->info('Absensi libur sudah diisi.');
+
+            $this->info('Berhasil mengisi absensi libur untuk ' . $siswas->count() . ' siswa.');
         } else {
             $this->info('Hari ini bukan hari libur.');
         }
     }
-
-    private function cekHariLibur($tanggal)
-    {
-        // Mengecek apakah tanggal ada di tabel liburs
-        return Libur::where('tanggal', $tanggal)->exists();
-    }
-
 }
