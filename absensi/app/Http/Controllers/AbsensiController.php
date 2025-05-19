@@ -189,6 +189,14 @@ class AbsensiController extends Controller
                 'jam_masuk' => $now,
                 'status_masuk' => $statusMasuk
             ]);
+            $no_hp_wali = $siswa->nomor_ortu;
+            $no_hp_wali_global = '62' . substr($no_hp_wali, 1);
+            WablasHelper::kirimPesan(
+                $no_hp_wali_global,
+                "✅ Absensi Masuk\nNama: {$siswa->nama}\nJam: " . $now->format('H:i:s') . "\nStatus: {$statusMasuk}"
+            );
+            \Log::info("Nomor asal: " . $no_hp_wali);
+            \Log::info("Nomor yang dikirim ke Wablas: " . $no_hp_wali_global);
             
             // Kirim notifikasi
             return response()->json([
@@ -204,6 +212,13 @@ class AbsensiController extends Controller
                 'jam_pulang' => $now,
                 'status_pulang' => 'Pulang'
             ]);
+            
+            $no_hp_wali = $siswa->nomor_ortu;
+            $no_hp_wali_global = '62' . substr($no_hp_wali, 1);
+            WablasHelper::kirimPesan(
+                $no_hp_wali_global,
+                "🏁 Absensi Pulang\nNama: {$siswa->nama}\nJam: " . $now->format('H:i:s') . "\nStatus: Pulang"
+            );
             
             // Kirim notifikasi
             return response()->json([
